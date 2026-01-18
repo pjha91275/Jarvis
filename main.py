@@ -1,15 +1,62 @@
 import speech_recognition as sr
-import musicLibrary
 import webbrowser
-import pyttsx3
+import musicLibrary
+from gtts import gTTS
+import pygame
+from dotenv import load_dotenv
+import os
+from google import genai
 import requests
 
-engine = pyttsx3.init()
-newsapi = "949c588e496b4351b94ac65788d5c843https://newsapi.org/v2/top-headlines?country=in&apiKey=949c588e496b4351b94ac65788d5c843"
+load_dotenv(".env.local")
 
 def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+    tts = gTTS(text)
+    tts.save('temp.mp3') 
+
+    # Initialize Pygame mixer
+    pygame.mixer.init()
+
+    # Load the MP3 file
+    pygame.mixer.music.load('temp.mp3')
+
+    # Play the MP3 file
+    pygame.mixer.music.play()
+
+    # Keep the program running until the music stops playing
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+    
+    pygame.mixer.music.unload()
+    os.remove("temp.mp3") 
+
+def aiProcess(command):
+
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=[
+            {
+                "role": "system",
+                "parts": [
+                    {
+                        "text": "You are a virtual assistant named Jarvis skilled in general tasks like Alexa and Google Assistant. Give short responses please."
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": command
+                    }
+                ]
+            }
+        ]
+    )
+
+    return response.text
 
 def processCommand(c):
     if "open google" in c.lower():
@@ -26,44 +73,59 @@ def processCommand(c):
         webbrowser.open(link)
 
     elif "news" in c.lower():
-        r = requests.get(f"https://newsapi.org/v2/top-headlines?country=in&apiKey={newsapi}")
-        if r.status_code == 200:
-            # Parse the JSON response
-            data = r.json()
-            
-            # Extract the articles
-            articles = data.get('articles', [])
-            
-            # Print the headlines
-            for article in articles:
-                speak(article['title'])
+        try:
+            r = requests.get(f"https://newsapi.org/v2/everything?q=india&pageSize=5&sortBy=publishedAt&apiKey={os.getenv('NEWS_API_KEY')}", timeout=5)
 
-    
+            if r.status_code != 200:
+                speak("Sorry, I could not fetch the news right now.")
+                return
+
+            data = r.json()
+            articles = data.get("articles", [])
+
+            if not articles:
+                speak("No news available right now.")
+                return
+
+            speak("Here are the top headlines.")
+            for article in articles[:5]:   
+                speak(article["title"])
+
+        except Exception as e:
+            speak("There was an error while fetching the news.")
+            print("News error:", e)
+
+
+    else:
+         # Let Gemini handle the request
+        output = aiProcess(c)
+        speak(output)
 
 
 if __name__ == "__main__":                                                           
     speak("Intializing Jarvis....")
     while True:
-        # Listen for the wake word "Jarvis"
-        # obtain audio from the microphone
+       
         r = sr.Recognizer()
-        
 
-        print("recognizing...")
-        # recognize speech using Google
+        # obtain audio from the microphone
         try:
             with sr.Microphone() as source:
                 print("Listening...")
-                audio = r.listen(source, timeout = 2, phrase_time_limit=1)
+                audio = r.listen(source, timeout=4, phrase_time_limit=3)
+            # recognize speech using Google
+            print("recognizing...")
             word = r.recognize_google(audio)
-            if(word.lower() == "jarvis"):
-                speak("Ya")
+            # Listen for the wake word "Jarvis
+            if "jarvis" in word.lower():
+                speak("Yes?")
                 # Listen for command
-                with sr.Microphone() as source:
+                with sr.Microphone() as source:  
                     print("Jarvis Active...")
-                    audio = r.listen(source)
+                    audio = r.listen(source, timeout=5, phrase_time_limit=4)
                     command = r.recognize_google(audio)
-
+                    print("Command heard:", command)
+    
                     processCommand(command)
 
         
