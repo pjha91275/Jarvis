@@ -31,9 +31,9 @@ Jarvis is a voice-activated virtual assistant built in Python. It listens to voi
 
 The codebase consists of the following key files:
 
-- **[main.py](file:///C:/Users/pjha9/Documents/ALL%20Coding/Projects/Mega%20Project%201%20-%20Jarvis/main.py):** Contains the core logic for the speech recognition loop, voice response system, action parsing, and integration with external APIs (Gemini & NewsAPI).
-- **[musicLibrary.py](file:///C:/Users/pjha9/Documents/ALL%20Coding/Projects/Mega%20Project%201%20-%20Jarvis/musicLibrary.py):** Simple lookup dictionary containing a map of song names to their respective streaming URLs (e.g., YouTube videos).
-- **[requirements.txt](file:///C:/Users/pjha9/Documents/ALL%20Coding/Projects/Mega%20Project%201%20-%20Jarvis/requirements.txt):** List of all python dependencies needed for setup.
+- **[main.py](main.py):** Contains the core logic for the speech recognition loop, voice response system, action parsing, and integration with external APIs (Gemini & NewsAPI).
+- **[musicLibrary.py](musicLibrary.py):** Simple lookup dictionary containing a map of song names to their respective streaming URLs (e.g., YouTube videos).
+- **[requirements.txt](requirements.txt):** List of all python dependencies needed for setup.
 - **`.env.local`:** Configuration file to store sensitive keys such as `GEMINI_API_KEY` and `NEWS_API_KEY`.
 
 ---
@@ -42,7 +42,10 @@ The codebase consists of the following key files:
 
 ### 1. Clone/Download the Project
 Download the repository files to your local workspace directory:  
-`C:/Users/pjha9/Documents/ALL Coding/Projects/Jarvis`
+```bash
+git clone https://github.com/pjha91275/Jarvis.git
+cd Jarvis
+```
 
 ### 2. Set Up Virtual Environment
 Initialize and activate your virtual environment:
