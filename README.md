@@ -42,7 +42,7 @@ The codebase consists of the following key files:
 
 ### 1. Clone/Download the Project
 Download the repository files to your local workspace directory:  
-`C:/Users/pjha9/Documents/ALL Coding/Projects/Mega Project 1 - Jarvis`
+`C:/Users/pjha9/Documents/ALL Coding/Projects/Jarvis`
 
 ### 2. Set Up Virtual Environment
 Initialize and activate your virtual environment:
